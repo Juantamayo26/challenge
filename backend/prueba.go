@@ -34,6 +34,7 @@ func getBuyers(w http.ResponseWriter, r *http.Request) {
 
 func getOneBuyer(w http.ResponseWriter, r *http.Request) {
 	buyerID := chi.URLParam(r, "ID")
+
 	fmt.Println(buyerID)
 	for _, b := range buyers {
 		if b.ID == buyerID {
@@ -68,5 +69,7 @@ func main() {
 	r.Get("/buyers", getBuyers)
 	r.Post("/buyers", createBuyer)
 	r.Get("/buyers/{ID}", getOneBuyer)
+	r.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("./public"))))
+	//r.Handle("/", http.FileServer(http.Dir("./public")))
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
