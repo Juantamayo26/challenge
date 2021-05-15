@@ -19,13 +19,7 @@ type buyer struct {
 
 type allBuyers []buyer
 
-var buyers = allBuyers{
-	{
-		ID:   "12321",
-		Name: "Task one",
-		Age:  12,
-	},
-}
+var buyers = allBuyers{}
 
 func getBuyers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -34,7 +28,6 @@ func getBuyers(w http.ResponseWriter, r *http.Request) {
 
 func getOneBuyer(w http.ResponseWriter, r *http.Request) {
 	buyerID := chi.URLParam(r, "ID")
-	fmt.Println(buyerID)
 	for _, b := range buyers {
 		if b.ID == buyerID {
 			w.Header().Set("Content-Type", "application/json")
@@ -47,7 +40,7 @@ func getOneBuyer(w http.ResponseWriter, r *http.Request) {
 }
 
 func createBuyer(w http.ResponseWriter, r *http.Request) {
-	var newBuyer buyer
+	var newBuyer []buyer
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
@@ -55,7 +48,7 @@ func createBuyer(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(reqBody, &newBuyer)
 
-	buyers = append(buyers, newBuyer)
+	buyers = newBuyer
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

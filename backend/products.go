@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"log"
 	"net/http"
-	"os"
 )
 
 //Types
@@ -22,24 +21,28 @@ type AllProducs []Product
 
 var Products = AllProducs{}
 
-func readData(fileName string) ([][]string, error) {
-	f, err := os.Open(fileName)
+func createProducts(w http.ResponseWriter, r *http.Request) {
+	reader := csv.NewReader(r.Body)
 
+	reader.Comma = '\''
+
+	records, err := reader.ReadAll()
 	if err != nil {
-		return [][]string{}, err
-	}
-	defer f.Close()
-
-	r := csv.NewReader(f)
-	r.Comma = '\''
-
-	records, err := r.ReadAll()
-
-	if err != nil {
-		return [][]string{}, err
+		fmt.Fprintf(w, "Error")
 	}
 
-	return records, nil
+	for _, record := range records {
+		product := Product{
+			ID:    record[0],
+			Name:  record[1],
+			Price: record[2],
+		}
+		Products = append(Products, product)
+	}
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(Products)
 }
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
@@ -62,22 +65,10 @@ func getOneProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	records, err := readData("products.csv")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, record := range records {
-		product := Product{
-			ID:    record[0],
-			Name:  record[1],
-			Price: record[2],
-		}
-		Products = append(Products, product)
-	}
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/products", getProducts)
+	r.Post("/products", createProducts)
 	r.Get("/products/{ID}", getOneProduct)
 
 	log.Fatal(http.ListenAndServe(":8000", r))
