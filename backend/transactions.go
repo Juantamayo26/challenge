@@ -12,11 +12,11 @@ import (
 
 //types
 type Transaction struct {
-	ID         string `json:"ID"`
-	BuyerID    string `json:"BuyerID"`
-	IP         string `json:"IP"`
-	Device     string `json:"Device"`
-	ProductsID string `json:"ProductsID"`
+	ID         string   `json:"ID"`
+	BuyerID    string   `json:"BuyerID"`
+	IP         string   `json:"IP"`
+	Device     string   `json:"Device"`
+	ProductsID []string `json:"ProductsID"`
 }
 
 type allTransactions []Transaction
@@ -41,12 +41,21 @@ func createTransactions(w http.ResponseWriter, r *http.Request) {
 		}
 		if content[i] == 0 && content[i+1] == 0 {
 
+			var p = 1
+			var products []string
+			for j := 1; j < len(aux); j++ {
+				if aux[j] == ',' || aux[j] == ')' {
+					products = append(products, aux[p:j])
+					p = j + 1
+				}
+			}
+
 			transaction := Transaction{
 				ID:         record[0],
 				BuyerID:    record[1],
 				IP:         record[2],
 				Device:     record[3],
-				ProductsID: aux,
+				ProductsID: products,
 			}
 
 			Transactions = append(Transactions, transaction)

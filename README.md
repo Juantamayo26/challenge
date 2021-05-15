@@ -1,38 +1,12 @@
 # API REST
 
-## Golang
+# Cargar base de datos
 
-endpoint score user
-endpoint all score of the users
+# Listar Compradores (READY)
 
-# INTERFACE
+# Consultar comprador
+## Historial de compras (READY)
+## Otroso Compradores usando la misma IP (READY)
+## Recomendaciones
 
-## Vuejs
-
-Name of the user
-Best scores
-
-# Create game
-
-## Phaser game engine
-
-Green apple +1
-Walls change every 10 apples
-Red apples -2 
-3D
-Follow pointer of the mouse 
-
-# Websockets (optional)
-
-
-### Backend: Go
-
-### Frontend: Typescript
-
-### Database: CockroachDB
-
-### API Router: chi
-
-### Interface: Vue.js & Vuetify
-
-### GameEngine: Phaser
+# Interfaz Web o Movil
