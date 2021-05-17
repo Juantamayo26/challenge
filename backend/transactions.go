@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 //types
@@ -26,7 +28,24 @@ var a = [5]string{"2", "4", "6", "8", "10"}
 var Transactions = allTransactions{}
 
 func createTransactions(w http.ResponseWriter, r *http.Request) {
-	content, err := ioutil.ReadAll(r.Body)
+	file, handler, err := r.FormFile("data")
+	fileName := handler.Filename
+
+	outfile, err := os.Create("./temp/" + fileName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer outfile.Close()
+	cpy, err := io.Copy(outfile, file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(cpy)
+
+	content, err := ioutil.ReadFile("./temp/" + fileName)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -114,5 +133,5 @@ func main() {
 	r.Post("/transactions", createTransactions)
 	r.Get("/transactions/{ID}", getOneTransaction)
 	r.Get("/transactions/ip/{IP}", getSameIP)
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":8001", r))
 }

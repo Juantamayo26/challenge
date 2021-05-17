@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"io"
 	"log"
 	"net/http"
+	"os"
 )
 
 //Types
@@ -21,9 +23,48 @@ type AllProducs []Product
 
 var Products = AllProducs{}
 
-func createProducts(w http.ResponseWriter, r *http.Request) {
-	reader := csv.NewReader(r.Body)
+func getProducts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(Products)
+}
 
+func getOneProduct(w http.ResponseWriter, r *http.Request) {
+	productID := chi.URLParam(r, "ID")
+
+	for _, p := range Products {
+		if p.ID == productID {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(p)
+			return
+		}
+	}
+
+	fmt.Fprintf(w, "Invalid ID")
+}
+
+func createProducts(w http.ResponseWriter, r *http.Request) {
+	file, handler, err := r.FormFile("data")
+	fileName := handler.Filename
+
+	outfile, err := os.Create("./temp/" + fileName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer outfile.Close()
+	cpy, err := io.Copy(outfile, file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(cpy)
+
+	csvFile, err := os.Open("./temp/" + fileName)
+	if err != nil {
+		fmt.Fprintf(w, "Error opening csvFile")
+	}
+	defer csvFile.Close()
+	reader := csv.NewReader(csvFile)
 	reader.Comma = '\''
 
 	records, err := reader.ReadAll()
@@ -45,25 +86,6 @@ func createProducts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(Products)
 }
 
-func getProducts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Products)
-}
-
-func getOneProduct(w http.ResponseWriter, r *http.Request) {
-	productID := chi.URLParam(r, "ID")
-
-	for _, p := range Products {
-		if p.ID == productID {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(p)
-			return
-		}
-	}
-
-	fmt.Fprintf(w, "Invalid ID")
-}
-
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -71,6 +93,6 @@ func main() {
 	r.Post("/products", createProducts)
 	r.Get("/products/{ID}", getOneProduct)
 
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":8001", r))
 
 }
