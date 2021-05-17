@@ -36,6 +36,7 @@ var buyers = allBuyers{}
 
 func createBuyer(w http.ResponseWriter, r *http.Request) {
 	var newBuyer []buyer
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
@@ -76,8 +77,6 @@ func createBuyer(w http.ResponseWriter, r *http.Request) {
 	mu := &api.Mutation{
 		CommitNow: true,
 	}
-	log.Println(p)
-	log.Println("HOLA")
 	pb, err := json.Marshal(p)
 	log.Println(string(pb))
 	if err != nil {
@@ -116,15 +115,15 @@ func createBuyer(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	type Root struct {
-		Me []Person `json:"me"`
-	}
+	//type Root struct {
+	//	Me []Person `json:"me"`
+	//}
 
-	var roo Root
-	err = json.Unmarshal(resp.Json, &roo)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//var roo Root
+	//err = json.Unmarshal(resp.Json, &roo)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	fmt.Println(string(resp.Json))
 }

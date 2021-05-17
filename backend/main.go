@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 )
@@ -40,14 +40,44 @@ func getOneBuyer(w http.ResponseWriter, r *http.Request) {
 }
 
 func createBuyer(w http.ResponseWriter, r *http.Request) {
-	var newBuyer []buyer
-	reqBody, err := ioutil.ReadAll(r.Body)
+	mr, err := r.MultipartReader()
 	if err != nil {
-		fmt.Fprintf(w, "Error")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	doc := []buyer{}
+	for {
+		part, err := mr.NextPart()
+
+		// This is OK, no more parts
+		if err == io.EOF {
+			break
+		}
+
+		// Some error
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if part.FormName() == "data" {
+			jsonDecoder := json.NewDecoder(part)
+			err = jsonDecoder.Decode(&doc)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
 	}
 
-	json.Unmarshal(reqBody, &newBuyer)
+	var newBuyer []buyer
 
+	data, err := json.Marshal(doc)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	json.Unmarshal(data, &newBuyer)
+
+	//buyers = doc //RARO
 	buyers = newBuyer
 
 	w.Header().Set("Content-Type", "application/json")
@@ -61,5 +91,5 @@ func main() {
 	r.Get("/buyers", getBuyers)
 	r.Post("/buyers", createBuyer)
 	r.Get("/buyers/{ID}", getOneBuyer)
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":8001", r))
 }
