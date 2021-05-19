@@ -23,7 +23,6 @@ type loc struct {
 
 // If omitempty is not set, then edges with empty values (0 for int/float, "" for string, false
 // for bool) would be created for values not specified explicitly.
-
 type Person struct {
 	Uid      string     `json:"uid,omitempty"`
 	Name     string     `json:"name,omitempty"`
@@ -47,6 +46,7 @@ func main() {
 	dg := dgo.NewDgraphClient(dc)
 
 	dob := time.Date(1980, 01, 01, 23, 0, 0, 0, time.UTC)
+	log.Println(dob)
 	// While setting an object if a struct has a Uid then its properties in the graph are updated
 	// else a new node is created.
 	// In the example below new nodes for Alice, Bob and Charlie and school are created (since they
@@ -76,11 +76,10 @@ func main() {
 
 	op := &api.Operation{}
 	op.Schema = `
-		name: string @index(exact) .
-		age: int .
-		married: bool .
-		loc: geo .
-		dob: datetime .
+		<Buyers.id>: string @index(exact) .
+		type <Buyers> {
+			Buyers.id
+		}
 	`
 
 	ctx := context.Background()

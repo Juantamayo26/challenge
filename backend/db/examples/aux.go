@@ -22,9 +22,11 @@ func main() {
 
 	op := &api.Operation{}
 	op.Schema = `
-		name: string @index(exact) .
-		age: int .
-		married: bool .
+		type User {
+			name: string @index(exact) .
+			age: int .
+			married: bool .
+		}
 	`
 
 	ctx := context.Background()

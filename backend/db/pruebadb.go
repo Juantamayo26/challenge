@@ -1,51 +1,59 @@
 package main
 
 import (
+	"context"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"io/ioutil"
-	"log"
-	"net/http"
-
-	"context"
 	"github.com/dgraph-io/dgo"
 	"github.com/dgraph-io/dgo/protos/api"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"google.golang.org/grpc"
+	"log"
+	"net/http"
 )
 
 // If omitempty is not set, then edges with empty values (0 for int/float, "" for string, false
 // for bool) would be created for values not specified explicitly.
 
 type Person struct {
-	Uid   string  `json:"uid,omitempty"`
-	Buyer []buyer `json:"data,omitempty"`
+	Uid     string    `json:"uid,omitempty"`
+	Product []product `json:"data,omitempty"`
 }
 
-// Types
-type buyer struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+//Types
+type product struct {
+	ID    string `json:"Product.id"`
+	Name  string `json:"Product.name"`
+	Price string `json:"Product.price"`
 }
 
-type allBuyers []buyer
+type AllProducs []product
 
-var buyers = allBuyers{}
+var Products = AllProducs{}
 
 func createBuyer(w http.ResponseWriter, r *http.Request) {
-	var newBuyer []buyer
+	reader := csv.NewReader(r.Body)
+	reader.Comma = '\''
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	records, err := reader.ReadAll()
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 	}
-	json.Unmarshal(reqBody, &newBuyer)
-	buyers = newBuyer
+
+	for _, record := range records {
+		product := product{
+			ID:    record[0],
+			Name:  record[1],
+			Price: record[2],
+		}
+		Products = append(Products, product)
+	}
 	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newBuyer)
+	json.NewEncoder(w).Encode(Products)
 
 	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
@@ -57,8 +65,8 @@ func createBuyer(w http.ResponseWriter, r *http.Request) {
 	dg := dgo.NewDgraphClient(dc)
 
 	p := Person{
-		Uid:   "_:alice",
-		Buyer: newBuyer,
+		Uid:     "_:alice",
+		Product: Products,
 	}
 	op := &api.Operation{}
 	op.Schema = `

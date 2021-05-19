@@ -1,0 +1,19 @@
+type Buyers{
+  id: String!
+  name: String!
+  age: Int!
+}
+
+type Products{
+  id: String!
+  name: String
+  price: String
+}
+
+type Transactions{
+  id: String!
+  buyerid: String!
+  ip: String!
+  device: String!
+  productids: [Products]
+}
