@@ -18,7 +18,7 @@ func Schema() {
     type Products{
       id: String! @id
       name: String
-      price: String
+      price: Int
     }
 
     type Transactions{

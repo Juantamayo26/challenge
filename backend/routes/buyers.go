@@ -2,6 +2,7 @@ package routes
 
 import (
 	"challenge/db"
+	"challenge/helper"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,18 +16,6 @@ type buyer struct {
 	ID   string `json:"ID"`
 	Name string `json:"Name"`
 	Age  int    `json:"Age"`
-}
-
-func removeDuplicates(arr []string) []string {
-	words_string := map[string]bool{}
-	for i := range arr {
-		words_string[arr[i]] = true
-	}
-	desired_output := []string{} // Keep all keys from the map into a slice.
-	for j, _ := range words_string {
-		desired_output = append(desired_output, j)
-	}
-	return desired_output
 }
 
 func CreateBuyer(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +73,7 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	uniqueData := removeDuplicates(input) // Remove the duplicates
+	uniqueData := helper.RemoveDuplicates(input) // Remove the duplicates
 
 	inputString := strings.Join(uniqueData, "") // Convert the []string to string
 	mutation := []byte(fmt.Sprintf(`

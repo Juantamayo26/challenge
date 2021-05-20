@@ -17,3 +17,19 @@ type Transactions{
   device: String
   productids: [Products]
 }
+
+query data{
+  queryBuyers{
+    id
+    name
+    age
+  }
+}
+
+query data{
+  queryProducts{
+    id
+    name
+    price
+  }
+}

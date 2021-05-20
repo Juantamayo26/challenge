@@ -32,4 +32,4 @@
   4. ProducsId
 
 Features
-  1. Improve complexity add data of Buyers
+  - [x] Improve complexity add data of Buyers
