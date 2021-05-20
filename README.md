@@ -3,7 +3,7 @@
 - [x] Cargar base de datos
   - [ ] Fecha unix timestamp
   - [ ] Lista de productos del día
-  - [ ] Lista de compradores del día
+  - [x] Lista de compradores del día
   - [ ] Lista de transacciones del día
 - [x] Listar Compradores
 - [ ] Consultar Comprador
@@ -25,8 +25,8 @@
   3. Price
 
 ### Transactions
-  1. Id
+  1. Id //
   2. BuyerId
   3. Ip 
-  4. Device
+  4. Device //
   4. ProducsId

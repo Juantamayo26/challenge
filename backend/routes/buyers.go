@@ -1,71 +1,19 @@
 package routes
 
 import (
-	"context"
+	"challenge/db"
 	"encoding/json"
 	"fmt"
-	"github.com/dgraph-io/dgo/v210"
-	"github.com/dgraph-io/dgo/v210/protos/api"
-	"google.golang.org/grpc"
 	"io"
-	"log"
 	"net/http"
+	"reflect"
 )
-
-type db struct {
-	Data *allBuyers `json:"all"`
-}
-
-type Person struct {
-	Uid   string  `json:"uid,omitempty"`
-	Buyer []buyer `json:"data,omitempty"`
-}
 
 // Types
 type buyer struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-}
-
-type allBuyers []buyer
-
-var buyers = allBuyers{}
-
-func GetBuyers(w http.ResponseWriter, r *http.Request) {
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
-	dgraphClient := dgo.NewDgraphClient(api.NewDgraphClient(conn))
-
-	txn := dgraphClient.NewTxn()
-	ctx := context.Background()
-	defer txn.Discard(ctx)
-
-	q := `
-    {
-			all(func: has(name)) {
-				id
-				name
-				age
-			}
-    }
-	`
-
-	res, err := txn.QueryWithVars(ctx, q, map[string]string{"$a": "Alice"})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	var data db
-	err = json.Unmarshal(res.Json, &data)
-	if err != nil {
-		log.Println("ERR2")
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
+	ID   string `json:"ID"`
+	Name string `json:"Name"`
+	Age  int    `json:"Age"`
 }
 
 func CreateBuyer(w http.ResponseWriter, r *http.Request) {
@@ -77,13 +25,10 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 	doc := []buyer{}
 	for {
 		part, err := mr.NextPart()
-
-		// This is OK, no more parts
 		if err == io.EOF {
 			break
 		}
 
-		// Some error
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -97,6 +42,7 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
 	var newBuyer []buyer
 	data, err := json.Marshal(doc)
 	if err != nil {
@@ -104,50 +50,33 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 	}
 	json.Unmarshal(data, &newBuyer)
 
-	//buyers = doc //RARO
-	buyers = newBuyer
+	//Adding data to db
+	for i := 0; i < len(newBuyer); i++ {
+		v := reflect.ValueOf(newBuyer[i])
 
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
-	if err != nil {
-		log.Fatal("While trying to dial gRPC")
+		temp := []interface{}{"1", "2", 3}
+		for i := 0; i < v.NumField(); i++ {
+			temp[i%3] = v.Field(i)
+			if (i+1)%3 == 0 {
+				mutation := []byte(fmt.Sprintf(`
+					mutation {
+						addBuyers(input:[
+							{
+							id:%q,
+							name:%q,
+							age:%d
+							}
+						]){
+							buyers{
+								id
+								name
+								age
+							}
+						}
+					}
+				`, temp...))
+				db.Add(mutation)
+			}
+		}
 	}
-	defer conn.Close()
-
-	dc := api.NewDgraphClient(conn)
-	dg := dgo.NewDgraphClient(dc)
-
-	p := Person{
-		Uid:   "_:alice",
-		Buyer: newBuyer,
-	}
-	//op := &api.Operation{}
-	//op.Schema = `
-	//	name: string @index(exact) .
-	//	age: int .
-	//	married: bool .
-	//	loc: geo .
-	//`
-
-	ctx := context.Background()
-	//err = dg.Alter(ctx, op)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-
-	mu := &api.Mutation{
-		CommitNow: true,
-	}
-	pb, err := json.Marshal(p)
-	log.Println(string(pb))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	mu.SetJson = pb
-	assigned, err := dg.NewTxn().Mutate(ctx, mu)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(assigned)
-
 }

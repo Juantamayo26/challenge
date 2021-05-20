@@ -1,19 +1,19 @@
 type Buyers{
-  id: String!
-  name: String!
-  age: Int!
+  id: String! @id
+  name: String
+  age: Int
 }
 
 type Products{
-  id: String!
+  id: String! @id
   name: String
   price: String
 }
 
 type Transactions{
-  id: String!
-  buyerid: String!
-  ip: String!
-  device: String!
+  id: String! @id
+  buyerid: [Buyers]
+  ip: String
+  device: String
   productids: [Products]
 }

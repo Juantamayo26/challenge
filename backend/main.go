@@ -25,7 +25,6 @@ func main() {
 	r.Use(middleware.Logger)
 
 	//routes
-	r.Get("/buyers", routes.GetBuyers)
 	r.Post("/buyers", routes.CreateBuyer)
 
 	//r.Get("/products", getBuyers)

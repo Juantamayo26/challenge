@@ -3,17 +3,14 @@ fetch('http://localhost:8080/graphql', {
   headers: {"Content-Type":"application/json" },
   body: JSON.stringify({
   "query":`
-    query {
-      queryUser() {
-        id
-        username
-        name
-        avatar_url {
-          url_address
-        }
-      }
+  query data{
+    queryBuyers{
+      id
+      name
+      age
     }
-    `
+  }
+  `
   })
 }).then(res => res.json())
   .then(data => {

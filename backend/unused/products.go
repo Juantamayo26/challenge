@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 )
 
 //Types
@@ -41,6 +42,9 @@ func getOneProduct(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "Invalid ID")
 }
+
+//func addToDb(){
+//}
 
 func createProducts(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("data")
@@ -80,6 +84,15 @@ func createProducts(w http.ResponseWriter, r *http.Request) {
 		}
 		Products = append(Products, product)
 	}
+	////
+	///////////////v := reflect.ValueOf(Products[0])
+	///////////////typeOfS := v.Type()
+	///////////////fmt.Println(typeOfS)
+
+	///////////////for i := 0; i < v.NumField(); i++ {
+	///////////////	fmt.Printf("Field: %s\tValue: %q\n", typeOfS.Field(i).Name, v.Field(i).Interface())
+	///////////////}
+	////
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)
