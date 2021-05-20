@@ -1,6 +1,7 @@
 package main
 
 import (
+	"challenge/db"
 	"challenge/routes"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -10,6 +11,7 @@ import (
 )
 
 func main() {
+	db.Schema()
 	r := chi.NewRouter()
 
 	//middleware

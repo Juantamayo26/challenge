@@ -24,25 +24,6 @@ type AllProducs []Product
 
 var Products = AllProducs{}
 
-func getProducts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Products)
-}
-
-func getOneProduct(w http.ResponseWriter, r *http.Request) {
-	productID := chi.URLParam(r, "ID")
-
-	for _, p := range Products {
-		if p.ID == productID {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(p)
-			return
-		}
-	}
-
-	fmt.Fprintf(w, "Invalid ID")
-}
-
 //func addToDb(){
 //}
 

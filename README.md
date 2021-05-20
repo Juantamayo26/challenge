@@ -30,3 +30,6 @@
   3. Ip 
   4. Device //
   4. ProducsId
+
+Features
+  1. Improve complexity add data of Buyers

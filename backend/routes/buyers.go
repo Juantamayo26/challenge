@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"strings"
 )
 
 // Types
@@ -14,6 +15,18 @@ type buyer struct {
 	ID   string `json:"ID"`
 	Name string `json:"Name"`
 	Age  int    `json:"Age"`
+}
+
+func removeDuplicates(arr []string) []string {
+	words_string := map[string]bool{}
+	for i := range arr {
+		words_string[arr[i]] = true
+	}
+	desired_output := []string{} // Keep all keys from the map into a slice.
+	for j, _ := range words_string {
+		desired_output = append(desired_output, j)
+	}
+	return desired_output
 }
 
 func CreateBuyer(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +64,7 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(data, &newBuyer)
 
 	//Adding data to db
+	var input []string
 	for i := 0; i < len(newBuyer); i++ {
 		v := reflect.ValueOf(newBuyer[i])
 
@@ -58,25 +72,33 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 		for i := 0; i < v.NumField(); i++ {
 			temp[i%3] = v.Field(i)
 			if (i+1)%3 == 0 {
-				mutation := []byte(fmt.Sprintf(`
-					mutation {
-						addBuyers(input:[
-							{
-							id:%q,
-							name:%q,
-							age:%d
-							}
-						]){
-							buyers{
-								id
-								name
-								age
-							}
-						}
+				cur := fmt.Sprintf(`
+					{
+						id:%q,
+						name:%q,
+						age:%d
 					}
-				`, temp...))
-				db.Add(mutation)
+					`, temp...)
+				input = append(input, cur)
 			}
 		}
 	}
+
+	uniqueData := removeDuplicates(input) // Remove the duplicates
+
+	inputString := strings.Join(uniqueData, "") // Convert the []string to string
+	mutation := []byte(fmt.Sprintf(`
+		mutation {
+			addBuyers(input:[
+			` + inputString + `
+			]){
+				buyers{
+					id
+					name
+					age
+				}
+			}
+		}
+	`))
+	db.Add(mutation)
 }
