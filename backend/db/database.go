@@ -10,7 +10,7 @@ import (
 func Schema() {
 	schema := []byte(fmt.Sprintf(`
 		type Buyers{
-			id: String! @id
+			id: String! @id @search(by: [exact])
 			name: String
 			age: Int
 			transaction: [Transactions] @hasInverse(field: buyerid)
@@ -25,7 +25,7 @@ func Schema() {
 
 		type Transactions{
 			id: String! @id
-			buyerid: Buyers
+			buyerid: Buyers 
 			ip: String @search(by: [exact])
 			device: String
 			productids: [Products]

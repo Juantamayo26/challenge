@@ -2,26 +2,6 @@
     <v-container grid-list-xl>
         <v-layout row wrap>
             <v-flex md6>
-                <v-card class="mb-3" v-for="(item, index) in buyers" :key="index"> 
-                    <v-card-text>
-                        <v-chip
-                        class="ma-2"
-                        color="primary"
-                        label
-                        >
-                            <v-icon left>
-                                mdi-account-circle-outline
-                            </v-icon>
-                            {{item.Name}}
-                        </v-chip>
-                        <p>{{item.Age}}</p>
-                        <p>{{item.ID}}</p>
-                        <v-btn @click="consultar(item.id)" class="ml-0" color="info">Consultar</v-btn>
-                    </v-card-text>
-                </v-card>
-            </v-flex>
-
-            <v-flex md6>
                 <v-card class="mb-3">
                     <!--v-form method="post" action="http://localhost:8002/buyers"> -->
                     <v-form @submit.prevent="addFiles"> 
@@ -85,19 +65,13 @@ export default {
     data() {
         return {
             info : "",
-            buyers: [],
             files: [],
             snackbar: false,
             text: ""
         }
     },
-    mounted () {
-        axios.get('http://localhost:8003/buyers')
-        .then(response => this.buyers = response.data)
-    },
     methods:{
         addFiles(){
-            //console.log(this.files)
             if(this.files.length === 0){
                 this.snackbar = true
                 this.text = "No se ha detectado archivos"
@@ -113,9 +87,6 @@ export default {
                 this.snackbar = true
                 this.text = "Archivos subidos correctamente"
             }
-        },
-        consultar(id){
-            console.log(id)
         }
     }
 }

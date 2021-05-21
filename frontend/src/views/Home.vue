@@ -1,25 +1,25 @@
 <template>
-  <v-container fluid>
-    <v-layout wrap>
-      <v-flex class="primary" xs12>
-        <h1>12</h1>
-      </v-flex>
-      <v-flex class="secondary" xs6>
-        <h1>6</h1>
-      </v-flex>
-      <v-flex class="secondary" xs6>
-        <h1>6</h1>
-      </v-flex>
-      <v-layout justify-center mt-5>
-        <v-flex class="error" xs6 >
-          <h1>center</h1>
-        </v-flex>
-      </v-layout>
-    </v-layout>
-  </v-container>
-</template>
+  <v-row class="text-center" justify="center">
+    <v-col
+      cols="12"
+      md="3"
+    >
+      <div
+        class="pa-4 secondary text-no-wrap rounded-pill"
+      >
+        .rounded-pill
+      </div>
+    </v-col>
 
-<script>
-  export default {
-  }
-</script>
+    <v-col
+      cols="12"
+      md="3"
+    >
+      <div
+        class="pa-7 secondary rounded-circle d-inline-block"
+      ></div>
+
+      <div>.rounded-circle</div>
+    </v-col>
+  </v-row>
+</template>

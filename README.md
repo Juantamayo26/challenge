@@ -1,15 +1,15 @@
 ### Restaurant
 
-- [x] Cargar base de datos
+- [ ] Cargar base de datos
   - [ ] Fecha unix timestamp
-  - [ ] Lista de productos del día
+  - [x] Lista de productos del día
   - [x] Lista de compradores del día
-  - [ ] Lista de transacciones del día
+  - [x] Lista de transacciones del día
 - [x] Listar Compradores
-- [ ] Consultar Comprador
+- [x] Consultar Comprador
   - [x] Historial de compras
   - [x] Otros compradores usando la misma IP
-  - [ ] Recomendaciones
+  - [x] Recomendaciones
 - [ ] Interfaz Web o Movil
 
 
@@ -25,7 +25,7 @@
   3. Price
 
 ### Transactions
-  1. Id //
+  1. Id 
   2. BuyerId
   3. Ip 
   4. Device //
