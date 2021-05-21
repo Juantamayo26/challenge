@@ -105,6 +105,7 @@ export default {
                 this.files.forEach(i => {
                     const formData = new FormData()
                     formData.append('data', i)
+                    console.log(i)
                     axios.post("http://localhost:8003/"+i.name, formData)
                 })
                 this.files = []

@@ -2,21 +2,24 @@ type Buyers{
   id: String! @id
   name: String
   age: Int
+  transaction: [Transactions] @hasInverse(field: buyerid)
 }
 
 type Products{
   id: String! @id
   name: String
-  price: String
+  price: Int
+  transaction: [Transactions] @hasInverse(field: productids)
 }
 
 type Transactions{
   id: String! @id
-  buyerid: [Buyers]
+  buyerid: Buyers
   ip: String
   device: String
   productids: [Products]
 }
+
 
 query data{
   queryBuyers{

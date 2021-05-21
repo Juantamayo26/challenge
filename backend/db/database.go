@@ -3,31 +3,33 @@ package db
 import (
 	"bytes"
 	"fmt"
-	//"io/ioutil"
+	"io/ioutil"
 	"net/http"
 )
 
 func Schema() {
 	schema := []byte(fmt.Sprintf(`
-    type Buyers{
-      id: String! @id
-      name: String
-      age: Int
-    }
+		type Buyers{
+			id: String! @id
+			name: String
+			age: Int
+			transaction: [Transactions] @hasInverse(field: buyerid)
+		}
 
-    type Products{
-      id: String! @id
-      name: String
-      price: Int
-    }
+		type Products{
+			id: String! @id
+			name: String
+			price: Int
+			transaction: [Transactions] @hasInverse(field: productids)
+		}
 
-    type Transactions{
-      id: String! @id
-      buyerid: [Buyers]
-      ip: String
-      device: String
-      productids: [Products]
-    }
+		type Transactions{
+			id: String! @id
+			buyerid: Buyers
+			ip: String @search(by: [exact])
+			device: String
+			productids: [Products]
+		}
 	`))
 
 	url := "http://localhost:8080/admin/schema"
@@ -41,6 +43,10 @@ func Schema() {
 	}
 	defer resp.Body.Close()
 	fmt.Println("Schema Added")
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
 }
 
 func Add(mutation []byte) {

@@ -1,13 +1,18 @@
 package helper
 
+import (
+	"fmt"
+)
+
 func RemoveDuplicates(arr []string) []string {
+	fmt.Println(arr)
 	words_string := map[string]bool{}
 	for i := range arr {
 		words_string[arr[i]] = true
 	}
 	desired_output := []string{} // Keep all keys from the map into a slice.
-	for j, _ := range words_string {
-		desired_output = append(desired_output, j)
+	for key, _ := range words_string {
+		desired_output = append(desired_output, key)
 	}
 	return desired_output
 }

@@ -2,7 +2,6 @@ package routes
 
 import (
 	"challenge/db"
-	"challenge/helper"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -50,22 +49,25 @@ func CreateProducts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var input []string
+	validator := map[string]bool{}
 	for _, record := range records {
 		price, err := strconv.Atoi(record[2])
 		if err != nil {
 			fmt.Printf("i=%d, type: %T\n", price, price)
 		}
-		cur := fmt.Sprintf(`
-			{
-				id:%q,
-				name:%q,
-				price:%d
-			}
-		`, record[0], record[1], price)
-		input = append(input, cur)
+		if validator[record[0]] != true {
+			validator[record[0]] = true
+			cur := fmt.Sprintf(`
+				{
+					id:%q,
+					name:%q,
+					price:%d
+				}
+			`, record[0], record[1], price)
+			input = append(input, cur)
+		}
 	}
-	uniqueData := helper.RemoveDuplicates(input) // Remove the duplicates
-	inputString := strings.Join(uniqueData, "")  // Convert the []string to string
+	inputString := strings.Join(input, "") // Convert the []string to string
 	mutation := []byte(fmt.Sprintf(`
 		mutation {
 			addProducts(input: [
@@ -79,6 +81,6 @@ func CreateProducts(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	`))
-	fmt.Println(inputString)
+	//fmt.Println(inputString)
 	db.Add(mutation)
 }

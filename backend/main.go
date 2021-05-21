@@ -29,6 +29,7 @@ func main() {
 	//routes
 	r.Post("/buyers", routes.CreateBuyer)
 	r.Post("/products", routes.CreateProducts)
+	r.Post("/transactions", routes.CreateTransactions)
 
 	//r.Get("/products", getBuyers)
 	//r.Post("/products", createBuyer)
