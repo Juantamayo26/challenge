@@ -1,65 +1,42 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"challenge/db"
+	"challenge/routes"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"io/ioutil"
+	"github.com/go-chi/cors"
 	"log"
 	"net/http"
 )
 
-// Types
-type buyer struct {
-	ID   string `json:"ID"`
-	Name string `json:"Name"`
-	Age  int    `json:"Age"`
-}
-
-type allBuyers []buyer
-
-var buyers = allBuyers{}
-
-func getBuyers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(buyers)
-}
-
-func getOneBuyer(w http.ResponseWriter, r *http.Request) {
-	buyerID := chi.URLParam(r, "ID")
-	for _, b := range buyers {
-		if b.ID == buyerID {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(b)
-			return
-		}
-	}
-
-	fmt.Fprintf(w, "Invalid ID")
-}
-
-func createBuyer(w http.ResponseWriter, r *http.Request) {
-	var newBuyer []buyer
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		fmt.Fprintf(w, "Error")
-	}
-
-	json.Unmarshal(reqBody, &newBuyer)
-
-	buyers = newBuyer
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newBuyer)
-}
-
 func main() {
+	db.Schema()
 	r := chi.NewRouter()
+
+	//middleware
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8081", "https://localhost:8081"},
+		AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	r.Use(middleware.Logger)
-	r.Get("/buyers", getBuyers)
-	r.Post("/buyers", createBuyer)
-	r.Get("/buyers/{ID}", getOneBuyer)
-	log.Fatal(http.ListenAndServe(":8000", r))
+
+	//routes
+	r.Post("/buyers", routes.CreateBuyer)
+	r.Post("/products", routes.CreateProducts)
+	r.Post("/transactions", routes.CreateTransactions)
+
+	//r.Get("/products", getBuyers)
+	//r.Post("/products", createBuyer)
+
+	//r.Get("/transactions", getBuyers)
+	//r.Post("/transactions", createBuyer)
+	//r.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("./public"))))
+
+	log.Fatal(http.ListenAndServe(":8003", r))
 }
