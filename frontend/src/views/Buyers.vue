@@ -46,27 +46,18 @@ export default {
         this.getBuyers(this.page*this.perPage, this.perPage)
     },
     methods:{
-        consultar(id){
-            console.log(id)
-        },
         getBuyers(i, e){
             fetch('http://localhost:8080/graphql', {
                 method: 'POST',
                 headers: {"Content-Type":"application/json" },
                 body: queryBuyers(i, e)
             }).then(res => res.json())
-            //.then(buyers => console.log(buyers))
-            .then(buyers => this.buyers = buyers.data.queryBuyers)
+              .then(buyers => this.buyers = buyers.data.queryBuyers)
         }
     },
     watch: {
         buyers(){
             this.getBuyers(this.page*this.perPage, this.perPage)
-        }
-    },
-    computed: {
-        displayedBuyers() {
-            return this.buyers
         }
     }
 }
