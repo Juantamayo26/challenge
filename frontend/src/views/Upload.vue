@@ -1,8 +1,8 @@
 <template>
     <v-container grid-list-xl>
-        <v-layout row wrap>
+        <v-layout row wrap justify-center>
             <v-flex md6>
-                <v-card class="mb-3">
+                <v-card class="mb-3" >
                     <!--v-form method="post" action="http://localhost:8002/buyers"> -->
                     <v-form @submit.prevent="addFiles"> 
                         <v-file-input
