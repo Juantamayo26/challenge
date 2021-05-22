@@ -1,5 +1,31 @@
 <template>
     <v-container grid-list-xl>
+        <v-row justify="center">
+            <v-col cols="12" sm="6" md="4">
+      <v-dialog
+        ref="dialog"
+        v-model="modal"
+        :return-value.sync="date"
+        persistent
+        width="290px"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+            v-model="date"
+            label="Selecciona una fecha"
+            readonly
+            v-bind="attrs"
+            v-on="on"
+          ></v-text-field>
+        </template>
+        <v-date-picker v-model="date" scrollable>
+          <v-spacer></v-spacer>
+          <v-btn text color="primary" @click="modal = false">Cancelar</v-btn>
+          <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
+        </v-date-picker>
+      </v-dialog>
+    </v-col>
+        </v-row>
         <v-layout row wrap justify-center>
             <v-flex md6>
                 <v-card class="mb-3" >
@@ -9,9 +35,9 @@
                             v-model="files"
                             color="deep-purple accent-4"
                             counter
-                            label="File input"
+                            label="Adjunte los archivos"
                             multiple
-                            placeholder="Select your files"
+                            placeholder="Selecciona tus archivos"
                             prepend-icon="mdi-paperclip"
                             outlined
                             :show-size="1000"
@@ -64,6 +90,9 @@ import axios from "axios";
 export default {
     data() {
         return {
+            modal: false,
+            menu: false,
+            date: new Date().toISOString().substr(0, 10),
             info : "",
             files: [],
             snackbar: false,
@@ -77,8 +106,10 @@ export default {
                 this.text = "No se ha detectado archivos"
             }else{
                 this.files.forEach(i => {
+                    const date = (new Date(this.picker)).getTime()
                     const formData = new FormData()
                     formData.append('data', i)
+                    formData.append('date', date)
                     console.log(i)
                     axios.post("http://localhost:8003/"+i.name, formData)
                 })
