@@ -36,6 +36,7 @@ function queryOneBuyer(id){
         query: `
         query data{
             queryBuyers(filter: { id: {eq: "` + id + `"}}){
+                id
                 name
                 age
                 transaction{
@@ -56,6 +57,7 @@ function queryIp(ip){
         query:`
         query data{
             queryTransactions(filter: { ip : {eq: "` + ip + `"}}) {
+                id
                 ip
                 buyerid{
                     name

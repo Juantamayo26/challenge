@@ -1,7 +1,7 @@
 ### Restaurant
 
-- [ ] Cargar base de datos
-  - [ ] Fecha unix timestamp
+- [x] Cargar base de datos
+  - [x] Fecha unix timestamp
   - [x] Lista de productos del día
   - [x] Lista de compradores del día
   - [x] Lista de transacciones del día
@@ -10,7 +10,7 @@
   - [x] Historial de compras
   - [x] Otros compradores usando la misma IP
   - [x] Recomendaciones
-- [ ] Interfaz Web o Movil
+- [x] Interfaz Web o Movil
 
 
 
