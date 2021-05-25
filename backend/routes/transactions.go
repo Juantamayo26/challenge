@@ -12,6 +12,7 @@ import (
 
 func CreateTransactions(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("data")
+	date := r.FormValue("date")
 	fileName := handler.Filename
 
 	outfile, err := os.Create("./temp/" + fileName)
@@ -59,6 +60,7 @@ func CreateTransactions(w http.ResponseWriter, r *http.Request) {
 			}
 			data := fmt.Sprintf(`
 				{
+					date: %q
 					id: %q
 					buyerid: {
 						id: %q
@@ -68,7 +70,7 @@ func CreateTransactions(w http.ResponseWriter, r *http.Request) {
 					productids: %s
 				}
 			`,
-				record[0], record[1], record[2], record[3], products)
+				date, record[0], record[1], record[2], record[3], products)
 			input = append(input, data)
 			index = 0
 			aux = ""
@@ -81,13 +83,13 @@ func CreateTransactions(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println(len(input))
 	mutation := []byte(fmt.Sprintf(`
 		mutation {
 			addTransactions(input:
 			%s
 			){
 				transactions{
+					date
 					id
 					buyerid{
 						id

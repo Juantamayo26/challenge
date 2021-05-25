@@ -2,34 +2,33 @@
     <v-container grid-list-xl>
         <v-row justify="center">
             <v-col cols="12" sm="6" md="4">
-      <v-dialog
-        ref="dialog"
-        v-model="modal"
-        :return-value.sync="date"
-        persistent
-        width="290px"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            v-model="date"
-            label="Selecciona una fecha"
-            readonly
-            v-bind="attrs"
-            v-on="on"
-          ></v-text-field>
-        </template>
-        <v-date-picker v-model="date" scrollable>
-          <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="modal = false">Cancelar</v-btn>
-          <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
-        </v-date-picker>
-      </v-dialog>
-    </v-col>
+                <v-dialog
+                    ref="dialog"
+                    v-model="modal"
+                    :return-value.sync="date"
+                    persistent
+                    width="290px"
+                >
+                    <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                        v-model="date"
+                        label="Selecciona una fecha"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                    ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="date" scrollable>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="modal = false">Cancelar</v-btn>
+                    <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
+                    </v-date-picker>
+                </v-dialog>
+            </v-col>
         </v-row>
         <v-layout row wrap justify-center>
             <v-flex md6>
                 <v-card class="mb-3" >
-                    <!--v-form method="post" action="http://localhost:8002/buyers"> -->
                     <v-form @submit.prevent="addFiles"> 
                         <v-file-input
                             v-model="files"
@@ -61,7 +60,7 @@
                             </span>
                             </template>
                         </v-file-input>
-                    <v-btn type="submit" block color="success">Agregar archivos</v-btn>
+                        <v-btn type="submit" block color="success">Agregar archivos</v-btn>
                     </v-form>
 
                     <v-snackbar
@@ -106,11 +105,11 @@ export default {
                 this.text = "No se ha detectado archivos"
             }else{
                 this.files.forEach(i => {
-                    const date = (new Date(this.picker)).getTime()
+                    const date = (new Date(this.date)).getTime()
                     const formData = new FormData()
+                    console.log(date)
                     formData.append('data', i)
                     formData.append('date', date)
-                    console.log(i)
                     axios.post("http://localhost:8003/"+i.name, formData)
                 })
                 this.files = []

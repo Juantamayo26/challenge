@@ -1,41 +1,48 @@
 <template>
     <v-container grid-list-lg>
+
         <v-layout row>
             <v-flex xs12 class="text-center display-1 font-weight-black my-5">Cliente {{buyer.name}}</v-flex>
         </v-layout>
+
         <v-flex class="text-center">
             <h3 class="mb-5">Historial de compras</h3>
             <v-card elevation="6" > 
-                <h3> {{buyer.transaction[this.page].ip}} </h3>
-                <v-list-item v-for="(item, index) in displayedProducts" :key="index">
-                    <v-list-item-content>
-                        <v-list-item-title>{{item.name}} || {{item.price}}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+                <h3>IP: {{buyer.transaction[this.page].ip}} </h3>
+                <v-list >
+                    <template v-for="(item, index) in displayedProducts" >
+                        <h4 :key="index">{{item.name}}</h4>
+                        <p :key="index">${{item.price}}</p>
+                    </template>
+                </v-list>
             </v-card>
         </v-flex>
+
         <v-layout row justify-center>
             <h3 class="mt-5 mb-5">Usuarios con la misma IP </h3>
         </v-layout>
+
         <v-layout d-sm-none row wrap justify-center>
             <v-flex xs6 sm4 md4 lg2 class="text-center" v-for="(user, index) in users" :key="index">
                 <v-card elevation="6"> 
                     <v-card-text >
                         <v-chip
                         class="ma-2"
-                        color="primary"
+                        color="box"
                         label
+                        text-color="white"
                         >
                             <v-icon left>
                                 mdi-account-circle-outline
                             </v-icon>
                             {{user.buyerid.name}}
                         </v-chip>
-                        <p>Age: {{user.buyerid.age}}</p>
+                        <h4>{{user.buyerid.age}} años</h4>
                     </v-card-text>
                 </v-card>
             </v-flex>
         </v-layout>
+
         <v-sheet
         d-none
         class="mx-auto"
@@ -43,7 +50,6 @@
         max-width="1000"
         >
             <v-slide-group
-            v-model="model"
             class="pa-4 d-none d-sm-flex"
             show-arrows
             >
@@ -54,7 +60,6 @@
                         class="ma-4 text-center"
                         height="100"
                         width="150"
-                        @click="toggle"
                         >
                             <v-card-text >
                                 <v-chip
@@ -73,10 +78,15 @@
                     </v-slide-item>
             </v-slide-group>
         </v-sheet>
-            <v-layout row justify-center>
-                <v-btn @click="page--" v-if="page > 0" class="align-self-start" color="info">Anterior IP</v-btn>
-                <v-btn @click="page++" v-if="page < (this.buyer.transaction.length-1)" class="ml-10 " color="info">Siguiente IP</v-btn>
-            </v-layout>
+
+        <v-layout row justify-center>
+            <v-btn @click="page--" v-if="page > 0" class="align-self-start" color="info">Anterior IP</v-btn>
+            <v-btn @click="page++" v-if="page < (this.buyer.transaction.length-1)" class="ml-10 " color="info">Siguiente IP</v-btn>
+        </v-layout>
+
+        <v-layout row justify-center>
+            <h3 class="mt-5 mb-5">Recomendaciones</h3>
+        </v-layout>
         </v-container>
     </template>
 
