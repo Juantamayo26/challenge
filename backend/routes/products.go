@@ -24,10 +24,10 @@ func CreateProducts(w http.ResponseWriter, r *http.Request) {
 	defer outfile.Close()
 	cpy, err := io.Copy(outfile, content)
 	if err != nil {
+		fmt.Println(cpy)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(cpy)
 
 	csvFile, err := os.Open("./temp/" + fileName)
 	if err != nil {

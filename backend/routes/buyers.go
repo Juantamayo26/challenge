@@ -20,7 +20,6 @@ type buyer struct {
 func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 	file, _, err := r.FormFile("data")
 	date := r.FormValue("date")
-	fmt.Println(date)
 	doc := []buyer{}
 	jsonDecoder := json.NewDecoder(file)
 	err = jsonDecoder.Decode(&doc)
