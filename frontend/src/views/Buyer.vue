@@ -7,18 +7,15 @@
     </v-layout>
 
     <v-flex class="text-center">
-      <h3 class="mb-5">Historial de compras</h3>
-      <v-card elevation="6">
+        <h3 class="mb-5">Historial de compras</h3>
         <h3>IP: {{ buyer.transaction[page-1].ip }}</h3>
-        <v-list>
-          <template v-for="(item, index) in displayedProducts">
-            <div :key="index">
-                <h4> {{ item.name }}</h4>
-                <p>${{ item.price }}</p>
-            </div>
-          </template>
-        </v-list>
-      </v-card>
+        <v-data-table
+        :headers="headers"
+        :items="displayedProducts"
+        :items-per-page="5"
+        hide-default-footer
+        class="elevation-1"
+        ></v-data-table>
     </v-flex>
 
     <v-layout row justify-center>
@@ -71,9 +68,29 @@
         ></v-pagination>
     </v-container>
 
-    <v-layout row justify-center>
-      <h3 class="mt-5 mb-5">Recomendaciones</h3>
-    </v-layout>
+    <v-container v-if="recommendations.length > 0">
+      <v-layout row justify-center>
+        <h3 class="mt-5 mb-5">Recomendaciones</h3>
+      </v-layout>
+       <v-card>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Buscar"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-card-title>
+          <v-data-table
+          :headers="headers"
+          :items="recommendations"
+          :items-per-page="5"
+          class="elevation-1"
+          :search="search"
+          ></v-data-table>
+       </v-card>
+    </v-container>
     
 
   </v-container>
@@ -86,13 +103,27 @@ export default {
   props: ["id"],
   data() {
     return {
+      search: '',
       page: 1,
       buyer: [],
       users: [],
+      allProducts: [],
+      products: [],
+      recommendations: [],
+      headers: [
+          {
+            text: 'Nombre',
+            align: 'start',
+            sortable: false,
+            value: 'name',
+          },
+          { text: 'Precio', value: 'price' },
+        ]
     };
   },
   created() {
     this.getBuyer(this.$route.params.id);
+    this.getProducts();
   },
   methods: {
     //Obtener el comprador
@@ -104,7 +135,6 @@ export default {
       });
       const buyer = await res.json();
       this.buyer = buyer.data.queryBuyers[0];
-      this.getUserIp(this.buyer.transaction[this.page-1].ip);
     },
     //Obtener los usuarios con la misma ip del comprador
     async getUserIp(ip) {
@@ -118,18 +148,45 @@ export default {
     },
     //Obtener todos los productos para hacer la recomendacion
     async getProducts() {
-      fetch("http://localhost:8080/graphql", {
+      const res = await fetch("http://localhost:8080/graphql", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: queryProducts(),
-      })
-        .then((res) => res.json())
-        .then((products) => (this.products = products.data.queryProducts));
+      });
+      const products = await res.json()
+      this.allProducts = products.data.queryProducts;
+      this.getUserProducts()
     },
+    getUserProducts() {
+      this.buyer.transaction.forEach(i => {
+        i.productids.forEach(j => {
+          this.products.push(j.name)
+        })
+      })
+      this.recommendation()
+    },
+    recommendation () {
+      this.allProducts.forEach(i => {
+        if(!this.products.includes(i.name)){
+          var obj = {
+              name: i.name,
+              price: i.price
+          };
+          this.recommendations.push(obj)
+        }
+      })
+      console.log(this.recommendation)
+    }
   },
   computed: {
     displayedProducts: function () {
-      return this.buyer.transaction[this.page-1].productids;
+      try{
+        this.getUserIp(this.buyer.transaction[this.page-1].ip);
+        return this.buyer.transaction[this.page-1].productids;
+      }
+      catch{
+        console.log("error in display products")
+      }
     }
   },
 };
