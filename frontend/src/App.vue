@@ -9,7 +9,14 @@
 
       <v-toolbar-title>El Paisa</v-toolbar-title>
       <v-spacer></v-spacer>
-        <v-btn icon>
+          <v-text-field
+            v-model="id"
+            class="mt-5"
+            label="Buscar por ID"
+          ></v-text-field>
+        <v-btn
+        @click="submit"
+         icon>
             <v-icon>mdi-magnify</v-icon>
         </v-btn>
     </v-app-bar>
@@ -60,8 +67,15 @@
 <script>
   export default {
     data: () => ({
+      id: '',
       drawer: false,
       group: null,
     }),
+    methods: {
+      submit () {
+        this.$router.push('/buyer/'+this.id)
+        this.id = ''
+      }
+    }
   }
 </script>
