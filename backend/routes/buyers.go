@@ -5,7 +5,6 @@ import (
 	"challenge/helper"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"reflect"
 	"strings"
@@ -19,30 +18,14 @@ type buyer struct {
 }
 
 func CreateBuyer(w http.ResponseWriter, r *http.Request) {
-	mr, err := r.MultipartReader()
+	file, _, err := r.FormFile("data")
+	date := r.FormValue("date")
+	doc := []buyer{}
+	jsonDecoder := json.NewDecoder(file)
+	err = jsonDecoder.Decode(&doc)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-	doc := []buyer{}
-	for {
-		part, err := mr.NextPart()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if part.FormName() == "data" {
-			jsonDecoder := json.NewDecoder(part)
-			err = jsonDecoder.Decode(&doc)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		}
 	}
 
 	var newBuyer []buyer
@@ -57,12 +40,13 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(newBuyer); i++ {
 		v := reflect.ValueOf(newBuyer[i])
 
-		temp := []interface{}{"1", "2", 3}
+		temp := []interface{}{date, 1, 2, 3} // Save all the values of the struct
 		for i := 0; i < v.NumField(); i++ {
-			temp[i%3] = v.Field(i)
+			temp[(i%3)+1] = v.Field(i)
 			if (i+1)%3 == 0 {
 				cur := fmt.Sprintf(`
 					{
+						date: %q,
 						id:%q,
 						name:%q,
 						age:%d
@@ -82,6 +66,7 @@ func CreateBuyer(w http.ResponseWriter, r *http.Request) {
 			` + inputString + `
 			]){
 				buyers{
+					date
 					id
 					name
 					age

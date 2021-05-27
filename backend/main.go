@@ -3,11 +3,12 @@ package main
 import (
 	"challenge/db"
 	"challenge/routes"
+	"log"
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	"log"
-	"net/http"
 )
 
 func main() {
@@ -31,11 +32,6 @@ func main() {
 	r.Post("/products", routes.CreateProducts)
 	r.Post("/transactions", routes.CreateTransactions)
 
-	//r.Get("/products", getBuyers)
-	//r.Post("/products", createBuyer)
-
-	//r.Get("/transactions", getBuyers)
-	//r.Post("/transactions", createBuyer)
 	//r.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("./public"))))
 
 	log.Fatal(http.ListenAndServe(":8003", r))

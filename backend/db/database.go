@@ -10,6 +10,7 @@ import (
 func Schema() {
 	schema := []byte(fmt.Sprintf(`
 		type Buyers{
+			date: String
 			id: String! @id @search(by: [exact])
 			name: String
 			age: Int
@@ -17,6 +18,7 @@ func Schema() {
 		}
 
 		type Products{
+			date: String
 			id: String! @id
 			name: String
 			price: Int
@@ -24,6 +26,7 @@ func Schema() {
 		}
 
 		type Transactions{
+			date: String
 			id: String! @id
 			buyerid: Buyers 
 			ip: String @search(by: [exact])

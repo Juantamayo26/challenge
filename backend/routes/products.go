@@ -11,15 +11,9 @@ import (
 	"strings"
 )
 
-//Types
-type Product struct {
-	ID    string `json:"ID"`
-	Name  string `json:"Name"`
-	Price string `json:"Price"`
-}
-
 func CreateProducts(w http.ResponseWriter, r *http.Request) {
-	file, handler, err := r.FormFile("data")
+	content, handler, err := r.FormFile("data")
+	date := r.FormValue("date")
 	fileName := handler.Filename
 
 	outfile, err := os.Create("./temp/" + fileName)
@@ -28,12 +22,12 @@ func CreateProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer outfile.Close()
-	cpy, err := io.Copy(outfile, file)
+	cpy, err := io.Copy(outfile, content)
 	if err != nil {
+		fmt.Println(cpy)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(cpy)
 
 	csvFile, err := os.Open("./temp/" + fileName)
 	if err != nil {
@@ -59,11 +53,12 @@ func CreateProducts(w http.ResponseWriter, r *http.Request) {
 			validator[record[0]] = true
 			cur := fmt.Sprintf(`
 				{
+					date: %q,
 					id:%q,
 					name:%q,
 					price:%d
 				}
-			`, record[0], record[1], price)
+			`, date, record[0], record[1], price)
 			input = append(input, cur)
 		}
 	}
@@ -74,6 +69,7 @@ func CreateProducts(w http.ResponseWriter, r *http.Request) {
 			` + inputString + `
 			]){
 				products{
+					date
 					id
 					name
 					price
